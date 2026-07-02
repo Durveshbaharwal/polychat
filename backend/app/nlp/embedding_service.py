@@ -60,7 +60,7 @@ class EmbeddingService:
         if "/" not in model:
             model = f"sentence-transformers/{model}"
 
-        url = f"https://api-inference.huggingface.co/pipeline/feature-extraction/{model}"
+        url = f"https://api-inference.huggingface.co/models/{model}"
         headers = {
             "Content-Type": "application/json",
         }
