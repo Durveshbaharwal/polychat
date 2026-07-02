@@ -15,7 +15,7 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 
 from app.core.config import get_settings
-from app.core.exceptions import SearchError
+from app.core.exceptions import EmbeddingError, SearchError
 from app.nlp.embedding_service import EmbeddingService
 
 logger = logging.getLogger(__name__)
@@ -264,10 +264,64 @@ class FAISSIndex:
 
             # Already sorted by FAISS (highest score first)
             return results
+        except EmbeddingError as exc:
+            logger.warning(
+                "Embedding unavailable, falling back to keyword search: %s", exc
+            )
+            return self._keyword_search(query, language, k)
         except SearchError:
             raise
         except Exception as exc:
             raise SearchError(f"Search failed: {exc}") from exc
+
+    def _keyword_search(
+        self,
+        query: str,
+        language: str = "en",
+        top_k: int = 5,
+    ) -> List[SearchResult]:
+        """
+        Lightweight keyword/token-overlap search used as fallback when the
+        embedding service is unreachable (e.g. HuggingFace API down on free tier).
+
+        Uses character bigrams + word tokens for multilingual support.
+        Returns results sorted by descending Jaccard-overlap score.
+        """
+        def tokenize(text: str):
+            text = text.lower()
+            words = set(text.split())
+            # character bigrams for CJK / Hindi / Tamil support
+            bigrams = set(text[i:i+2] for i in range(len(text) - 1))
+            return words | bigrams
+
+        query_tokens = tokenize(query)
+        if not query_tokens:
+            return []
+
+        scored: List[Tuple[float, FAQRecord]] = []
+        for record in self._records:
+            rec_tokens = tokenize(record.question)
+            # Jaccard similarity
+            intersection = len(query_tokens & rec_tokens)
+            union = len(query_tokens | rec_tokens)
+            score = intersection / union if union > 0 else 0.0
+            scored.append((score, record))
+
+        scored.sort(key=lambda x: x[0], reverse=True)
+
+        results: List[SearchResult] = []
+        for score, record in scored[:top_k]:
+            results.append(
+                SearchResult(
+                    faq_id=record.id,
+                    intent=record.intent,
+                    question=record.question,
+                    answer=record.get_answer(language),
+                    confidence=round(score * 0.85, 4),  # scale down slightly vs semantic
+                    suggested_questions=record.get_suggested_questions(language),
+                )
+            )
+        return results
 
     def get_all_records(self) -> List[FAQRecord]:
         return list(self._records)

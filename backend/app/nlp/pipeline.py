@@ -81,7 +81,11 @@ async def initialize_nlp_pipeline() -> None:
             _faiss_index.build(faq_data)
             logger.info("NLP pipeline ready. Index contains %d entries.", _faiss_index.faq_count)
     
-    # Preload the embedding model into memory so the first request is instant
-    logger.info("Preloading embedding model...")
-    embedding_service._load_model()
-    logger.info("NLP pipeline initialization complete.")
+    # Preload the embedding model only when running locally (not via API)
+    # — on the free Render tier the local model exceeds the 512MB RAM limit.
+    if not settings.use_inference_api:
+        logger.info("Preloading embedding model...")
+        embedding_service._load_model()
+        logger.info("NLP pipeline initialization complete.")
+    else:
+        logger.info("NLP pipeline initialization complete (using HuggingFace Inference API for queries).")
