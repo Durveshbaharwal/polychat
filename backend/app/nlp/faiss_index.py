@@ -285,12 +285,15 @@ class FAISSIndex:
         embedding service is unreachable (e.g. HuggingFace API down on free tier).
 
         Uses character bigrams + word tokens for multilingual support.
+        Also matches against the record's pre-defined keyword list and the
+        localized answer text, giving good coverage for both English and
+        Indic language queries.
         Returns results sorted by descending Jaccard-overlap score.
         """
         def tokenize(text: str):
             text = text.lower()
             words = set(text.split())
-            # character bigrams for CJK / Hindi / Tamil support
+            # character bigrams for CJK / Hindi / Tamil / Marathi support
             bigrams = set(text[i:i+2] for i in range(len(text) - 1))
             return words | bigrams
 
@@ -300,7 +303,13 @@ class FAISSIndex:
 
         scored: List[Tuple[float, FAQRecord]] = []
         for record in self._records:
-            rec_tokens = tokenize(record.question)
+            # Combine question tokens + the record's keyword list + localized answer
+            corpus_text = record.question
+            if hasattr(record, "answers") and isinstance(record.answers, dict):
+                # add localized answer for extra matching surface
+                corpus_text += " " + record.answers.get(language, "") + " " + record.answers.get("en", "")
+            rec_tokens = tokenize(corpus_text)
+
             # Jaccard similarity
             intersection = len(query_tokens & rec_tokens)
             union = len(query_tokens | rec_tokens)
