@@ -51,10 +51,11 @@ class EmbeddingService:
             ) from exc
 
     def _query_inference_api(self, inputs: List[str] | str) -> list:
-        """Query HuggingFace Serverless Inference API for vector embeddings."""
+        """Query HuggingFace Serverless Inference API with retries for transient DNS/network lag."""
         import json
         import urllib.request
         import urllib.error
+        import time
 
         model = self._model_name
         if "/" not in model:
@@ -68,16 +69,40 @@ class EmbeddingService:
             headers["Authorization"] = f"Bearer {settings.hf_api_token}"
 
         data = json.dumps({"inputs": inputs}).encode("utf-8")
-        req = urllib.request.Request(url, data=data, headers=headers)
-
-        try:
-            with urllib.request.urlopen(req) as response:
-                return json.loads(response.read().decode("utf-8"))
-        except urllib.error.HTTPError as e:
-            err_body = e.read().decode("utf-8")
-            raise EmbeddingError(f"HuggingFace API HTTP Error: {e.code} - {err_body}")
-        except Exception as e:
-            raise EmbeddingError(f"HuggingFace API connection failed: {e}")
+        
+        max_retries = 5
+        backoff = 2
+        
+        for attempt in range(max_retries):
+            req = urllib.request.Request(url, data=data, headers=headers)
+            try:
+                with urllib.request.urlopen(req) as response:
+                    return json.loads(response.read().decode("utf-8"))
+            except urllib.error.HTTPError as e:
+                if e.code == 503 and attempt < max_retries - 1:
+                    logger.warning(
+                        "HuggingFace model is loading (503). Retrying in %ds...", backoff
+                    )
+                    time.sleep(backoff)
+                    backoff *= 1.5
+                    continue
+                err_body = e.read().decode("utf-8")
+                raise EmbeddingError(f"HuggingFace API HTTP Error: {e.code} - {err_body}")
+            except Exception as e:
+                if attempt < max_retries - 1:
+                    logger.warning(
+                        "HuggingFace API connection failed (attempt %d/%d): %s. Retrying in %ds...",
+                        attempt + 1,
+                        max_retries,
+                        e,
+                        backoff,
+                    )
+                    time.sleep(backoff)
+                    backoff *= 1.5
+                    continue
+                raise EmbeddingError(
+                    f"HuggingFace API connection failed after {max_retries} attempts: {e}"
+                )
 
     def _cache_key(self, text: str) -> str:
         return hashlib.md5(text.encode("utf-8")).hexdigest()
