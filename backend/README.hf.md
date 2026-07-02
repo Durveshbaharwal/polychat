@@ -1,5 +1,5 @@
 ---
-title: PolyChat Backend
+title: polychat
 emoji: 🌐
 colorFrom: indigo
 colorTo: purple
