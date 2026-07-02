@@ -54,12 +54,22 @@ async def initialize_nlp_pipeline() -> None:
         # Build index from FAQ data file
         faq_path = settings.faq_data_file
         if not faq_path.exists():
-            # Try relative to backend directory
+            # Try relative to backend directory (local development)
             alt_path = Path(__file__).parent.parent.parent.parent / "data" / "faqs.json"
+            # Try inside the packaged app directory (production container deployment)
+            packaged_path = Path(__file__).parent.parent / "faqs.json"
+            
             if alt_path.exists():
                 faq_path = alt_path
+            elif packaged_path.exists():
+                faq_path = packaged_path
             else:
-                logger.error("FAQ data file not found at %s or %s", settings.faq_data_file, alt_path)
+                logger.error(
+                    "FAQ data file not found at %s or %s or %s",
+                    settings.faq_data_file,
+                    alt_path,
+                    packaged_path,
+                )
                 return
 
         logger.info("Building FAISS index from FAQ data: %s", faq_path)
