@@ -54,6 +54,10 @@ class Settings(BaseSettings):
     supported_languages: List[str] = ["en", "hi", "mr", "ta", "pa"]
     default_language: str = "en"
 
+    # ── HuggingFace Inference API ────────────────────────────────────────────
+    use_inference_api: bool = False
+    hf_api_token: Optional[str] = None
+
     # ── Session ──────────────────────────────────────────────────────────────
     session_timeout: int = 1800  # seconds
     max_history_length: int = 20
