@@ -169,13 +169,25 @@ class FAISSIndex:
         import faiss
 
         meta_path = self._index_path.with_suffix(".meta.json")
+        index_path = self._index_path
 
-        if not self._index_path.exists() or not meta_path.exists():
-            logger.info("No persisted FAISS index found at %s", self._index_path)
-            return False
+        if not index_path.exists() or not meta_path.exists():
+            # Try inside the packaged app directory (production container deployment)
+            packaged_index = Path(__file__).parent.parent / "faiss.index"
+            packaged_meta = Path(__file__).parent.parent / "faiss.meta.json"
+            if packaged_index.exists() and packaged_meta.exists():
+                index_path = packaged_index
+                meta_path = packaged_meta
+            else:
+                logger.info(
+                    "No persisted FAISS index found at %s or %s",
+                    self._index_path,
+                    packaged_index,
+                )
+                return False
 
         try:
-            self._index = faiss.read_index(str(self._index_path))
+            self._index = faiss.read_index(str(index_path))
 
             with open(meta_path, "r", encoding="utf-8") as f:
                 meta = json.load(f)
