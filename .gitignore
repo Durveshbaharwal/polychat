@@ -1,0 +1,25 @@
+# Node modules
+node_modules/
+dist/
+dist-node/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+venv/
+env/
+
+# Environment variables
+.env
+
+# SQLite and FAISS state
+polychat.db
+data/polychat.db*
+models/faiss.index*
+models/huggingface/
+
+# OS specific
+.DS_Store
+Thumbs.db
