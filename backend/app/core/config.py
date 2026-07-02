@@ -8,7 +8,7 @@ from __future__ import annotations
 import json
 from functools import lru_cache
 from pathlib import Path
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -33,7 +33,7 @@ class Settings(BaseSettings):
 
     # ── API ──────────────────────────────────────────────────────────────────
     api_v1_prefix: str = "/api/v1"
-    cors_origins: List[str] = [
+    cors_origins: Any = [
         "http://localhost:3000",
         "http://localhost:5173",
         "http://127.0.0.1:3000",
