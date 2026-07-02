@@ -1,0 +1,339 @@
+{
+    "project": {
+        "name": "PolyChat",
+        "version": "1.0.0",
+        "description": "Production-ready multilingual NLP-based Website QA Chatbot",
+        "repository": "polychat",
+        "execution_mode": "dependency_graph"
+    },
+    "milestones": [
+        {
+            "id": "M1",
+            "title": "Project Foundation"
+        },
+        {
+            "id": "M2",
+            "title": "Backend Foundation"
+        },
+        {
+            "id": "M3",
+            "title": "Database"
+        },
+        {
+            "id": "M4",
+            "title": "NLP Engine"
+        },
+        {
+            "id": "M5",
+            "title": "REST APIs"
+        },
+        {
+            "id": "M6",
+            "title": "Frontend Widget"
+        },
+        {
+            "id": "M7",
+            "title": "Widget SDK"
+        },
+        {
+            "id": "M8",
+            "title": "Deployment"
+        },
+        {
+            "id": "M9",
+            "title": "Testing"
+        },
+        {
+            "id": "M10",
+            "title": "Documentation"
+        }
+    ],
+    "tasks": [
+        {
+            "id": "P1.1",
+            "title": "Initialize repository structure",
+            "milestone": "M1",
+            "priority": "critical",
+            "estimated_hours": 1,
+            "parallel": true,
+            "depends_on": [],
+            "deliverables": [
+                "backend/",
+                "frontend/",
+                "sdk/",
+                "docs/",
+                "docker/",
+                "models/",
+                "data/"
+            ],
+            "validation": [
+                "Folder structure matches TRD"
+            ],
+            "definition_of_done": [
+                "Repository initialized"
+            ]
+        },
+        {
+            "id": "P1.2",
+            "title": "Configure Git repository",
+            "milestone": "M1",
+            "priority": "high",
+            "estimated_hours": 1,
+            "parallel": true,
+            "depends_on": [
+                "P1.1"
+            ],
+            "deliverables": [
+                ".gitignore",
+                "README.md",
+                "LICENSE"
+            ],
+            "validation": [
+                "Repository pushes successfully"
+            ],
+            "definition_of_done": [
+                "Git configuration complete"
+            ]
+        },
+        {
+            "id": "P2.1",
+            "title": "Scaffold FastAPI backend",
+            "milestone": "M2",
+            "priority": "critical",
+            "estimated_hours": 2,
+            "parallel": true,
+            "depends_on": [
+                "P1.1"
+            ],
+            "deliverables": [
+                "FastAPI project",
+                "API router",
+                "Service layer",
+                "Repository layer"
+            ],
+            "validation": [
+                "Application starts successfully"
+            ],
+            "definition_of_done": [
+                "Backend boots without errors"
+            ]
+        },
+        {
+            "id": "P3.1",
+            "title": "Configure PostgreSQL",
+            "milestone": "M3",
+            "priority": "critical",
+            "estimated_hours": 2,
+            "parallel": false,
+            "depends_on": [
+                "P2.1"
+            ],
+            "deliverables": [
+                "Database connection",
+                "Alembic",
+                "Models"
+            ],
+            "validation": [
+                "Database connection established"
+            ],
+            "definition_of_done": [
+                "Migration successful"
+            ]
+        },
+        {
+            "id": "P4.1",
+            "title": "Import FAQ dataset",
+            "milestone": "M4",
+            "priority": "critical",
+            "estimated_hours": 2,
+            "parallel": false,
+            "depends_on": [
+                "P3.1"
+            ],
+            "deliverables": [
+                "Importer",
+                "Dataset loader"
+            ],
+            "validation": [
+                "FAQ records available"
+            ],
+            "definition_of_done": [
+                "Dataset loaded"
+            ]
+        },
+        {
+            "id": "P4.2",
+            "title": "Generate embeddings",
+            "milestone": "M4",
+            "priority": "critical",
+            "estimated_hours": 3,
+            "parallel": false,
+            "depends_on": [
+                "P4.1"
+            ],
+            "deliverables": [
+                "Sentence Transformer integration",
+                "Embedding generator"
+            ],
+            "validation": [
+                "Embeddings generated"
+            ],
+            "definition_of_done": [
+                "Vector representations stored"
+            ]
+        },
+        {
+            "id": "P4.3",
+            "title": "Create FAISS vector index",
+            "milestone": "M4",
+            "priority": "critical",
+            "estimated_hours": 2,
+            "parallel": false,
+            "depends_on": [
+                "P4.2"
+            ],
+            "deliverables": [
+                "FAISS index"
+            ],
+            "validation": [
+                "Similarity search operational"
+            ],
+            "definition_of_done": [
+                "Index persisted"
+            ]
+        },
+        {
+            "id": "P5.4",
+            "title": "Implement POST /chat",
+            "milestone": "M5",
+            "priority": "critical",
+            "estimated_hours": 3,
+            "parallel": false,
+            "depends_on": [
+                "P4.3"
+            ],
+            "deliverables": [
+                "Chat endpoint",
+                "Validation",
+                "Conversation flow"
+            ],
+            "validation": [
+                "Returns semantic answer"
+            ],
+            "definition_of_done": [
+                "Endpoint passes integration tests"
+            ]
+        },
+        {
+            "id": "P6.1",
+            "title": "Develop React chat widget",
+            "milestone": "M6",
+            "priority": "critical",
+            "estimated_hours": 6,
+            "parallel": true,
+            "depends_on": [
+                "P1.1"
+            ],
+            "deliverables": [
+                "Chat UI",
+                "Conversation",
+                "Theme",
+                "Language selector"
+            ],
+            "validation": [
+                "Widget renders correctly"
+            ],
+            "definition_of_done": [
+                "Responsive UI complete"
+            ]
+        },
+        {
+            "id": "P7.1",
+            "title": "Build Widget SDK",
+            "milestone": "M7",
+            "priority": "high",
+            "estimated_hours": 4,
+            "parallel": true,
+            "depends_on": [
+                "P6.1"
+            ],
+            "deliverables": [
+                "SDK",
+                "Initialization API",
+                "Widget controller"
+            ],
+            "validation": [
+                "Widget embeddable"
+            ],
+            "definition_of_done": [
+                "SDK documented"
+            ]
+        },
+        {
+            "id": "P8.1",
+            "title": "Dockerize application",
+            "milestone": "M8",
+            "priority": "high",
+            "estimated_hours": 3,
+            "parallel": false,
+            "depends_on": [
+                "P5.4",
+                "P7.1"
+            ],
+            "deliverables": [
+                "Dockerfile",
+                "docker-compose.yml"
+            ],
+            "validation": [
+                "Stack launches successfully"
+            ],
+            "definition_of_done": [
+                "Application containerized"
+            ]
+        },
+        {
+            "id": "P9.1",
+            "title": "Execute automated tests",
+            "milestone": "M9",
+            "priority": "critical",
+            "estimated_hours": 4,
+            "parallel": false,
+            "depends_on": [
+                "P8.1"
+            ],
+            "deliverables": [
+                "Unit tests",
+                "Integration tests"
+            ],
+            "validation": [
+                "Minimum 80% coverage"
+            ],
+            "definition_of_done": [
+                "All tests passing"
+            ]
+        },
+        {
+            "id": "P10.1",
+            "title": "Complete documentation",
+            "milestone": "M10",
+            "priority": "medium",
+            "estimated_hours": 3,
+            "parallel": true,
+            "depends_on": [
+                "P9.1"
+            ],
+            "deliverables": [
+                "README",
+                "PRD",
+                "TRD",
+                "API_SPEC"
+            ],
+            "validation": [
+                "Documentation reviewed"
+            ],
+            "definition_of_done": [
+                "Project submission ready"
+            ]
+        }
+    ]
+}
