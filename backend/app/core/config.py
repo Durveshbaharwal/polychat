@@ -27,8 +27,8 @@ class Settings(BaseSettings):
     # ── App ──────────────────────────────────────────────────────────────────
     app_name: str = "PolyChat"
     app_version: str = "1.0.0"
-    env: str = "development"
-    debug: bool = True
+    env: str = "production"
+    debug: bool = False
     log_level: str = "INFO"
 
     # ── API ──────────────────────────────────────────────────────────────────
@@ -55,7 +55,9 @@ class Settings(BaseSettings):
     default_language: str = "en"
 
     # ── HuggingFace Inference API ────────────────────────────────────────────
-    use_inference_api: bool = False
+    # Default True: uses HF Inference API so no local 470MB model is loaded.
+    # Set USE_INFERENCE_API=False in your local .env to use the local model.
+    use_inference_api: bool = True
     hf_api_token: Optional[str] = None
 
     # ── Session ──────────────────────────────────────────────────────────────
